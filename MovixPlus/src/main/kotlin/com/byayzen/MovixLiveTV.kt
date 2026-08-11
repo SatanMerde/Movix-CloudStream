@@ -83,10 +83,67 @@ object MovixLiveTV {
                 val channelName = meta.name ?: return@mapNotNull null
                 val channelId = meta.id ?: return@mapNotNull null
                 
-                // Try API poster, then our hardcoded high-quality logos, then fallback avatar
+                val normalizedName = channelName.lowercase().replace(" ", "").replace("+", "").replace("-", "")
+                val matchedLogoUrl = when {
+                    normalizedName.contains("tf1") -> channelLogos["TF1"]
+                    normalizedName.contains("france2") -> channelLogos["France 2"]
+                    normalizedName.contains("france3") -> channelLogos["France 3"]
+                    normalizedName.contains("france4") -> channelLogos["France 4"]
+                    normalizedName.contains("france5") -> channelLogos["France 5"]
+                    normalizedName.contains("m6") -> channelLogos["M6"]
+                    normalizedName.contains("arte") -> channelLogos["Arte"]
+                    normalizedName.contains("c8") -> channelLogos["C8"]
+                    normalizedName.contains("w9") -> channelLogos["W9"]
+                    normalizedName.contains("tmc") -> channelLogos["TMC"]
+                    normalizedName.contains("tfx") -> channelLogos["TFX"]
+                    normalizedName.contains("nrj12") -> channelLogos["NRJ 12"]
+                    normalizedName.contains("bfm") -> channelLogos["BFM TV"]
+                    normalizedName.contains("cnews") -> channelLogos["CNEWS"]
+                    normalizedName.contains("cstar") -> channelLogos["CSTAR"]
+                    normalizedName.contains("gulli") -> channelLogos["Gulli"]
+                    normalizedName.contains("lequipe") -> channelLogos["L'Équipe"]
+                    normalizedName.contains("6ter") -> channelLogos["6ter"]
+                    normalizedName.contains("rmcstory") -> channelLogos["RMC Story"]
+                    normalizedName.contains("rmcdecouverte") -> channelLogos["RMC Découverte"]
+                    normalizedName.contains("rtl9") -> channelLogos["RTL9"]
+                    normalizedName.contains("ab1") -> channelLogos["AB1"]
+                    normalizedName.contains("action") -> channelLogos["Action"]
+                    normalizedName.contains("paramount") -> channelLogos["Paramount Channel"]
+                    
+                    normalizedName.contains("canal") && normalizedName.contains("sport") -> channelLogos["CANAL+ Sport"]
+                    normalizedName.contains("canal") && normalizedName.contains("foot") -> channelLogos["CANAL+ Foot"]
+                    normalizedName.contains("canal") && normalizedName.contains("cinema") -> channelLogos["CANAL+ Cinema"]
+                    normalizedName.contains("canal") && normalizedName.contains("grandecran") -> channelLogos["CANAL+ Grand Ecran"]
+                    normalizedName.contains("canal") && normalizedName.contains("series") -> channelLogos["CANAL+ Series"]
+                    normalizedName.contains("canal") && normalizedName.contains("docs") -> channelLogos["CANAL+ Docs"]
+                    normalizedName.contains("canal") && normalizedName.contains("kids") -> channelLogos["CANAL+ Kids"]
+                    normalizedName.contains("canal") -> channelLogos["CANAL+"]
+                    
+                    normalizedName.contains("bein") && normalizedName.contains("1") -> channelLogos["beIN SPORTS 1"]
+                    normalizedName.contains("bein") && normalizedName.contains("2") -> channelLogos["beIN SPORTS 2"]
+                    normalizedName.contains("bein") && normalizedName.contains("3") -> channelLogos["beIN SPORTS 3"]
+                    
+                    normalizedName.contains("eurosport") && normalizedName.contains("1") -> channelLogos["Eurosport 1"]
+                    normalizedName.contains("eurosport") && normalizedName.contains("2") -> channelLogos["Eurosport 2"]
+                    
+                    normalizedName.contains("rmcsport") && normalizedName.contains("1") -> channelLogos["RMC Sport 1"]
+                    normalizedName.contains("rmcsport") && normalizedName.contains("2") -> channelLogos["RMC Sport 2"]
+                    
+                    normalizedName.contains("teva") -> channelLogos["Teva"]
+                    normalizedName.contains("parispremiere") -> channelLogos["Paris Premiere"]
+                    normalizedName.contains("disney") -> channelLogos["Disney Channel"]
+                    normalizedName.contains("nickelodeon") -> channelLogos["Nickelodeon"]
+                    normalizedName.contains("cartoonnetwork") -> channelLogos["Cartoon Network"]
+                    normalizedName.contains("ushuaia") -> channelLogos["Ushuaia TV"]
+                    normalizedName.contains("histoire") -> channelLogos["Histoire TV"]
+                    else -> null
+                }
+                
+                // Try API poster, then our hardcoded high-quality logos (with padding!), then fallback avatar
+                val finalLogoUrl = matchedLogoUrl?.let { "https://wsrv.nl/?url=${it.removePrefix("https://")}&w=400&h=600&fit=contain&output=png" }
+                
                 val poster = meta.poster?.takeIf { it.isNotBlank() }
-                    ?: channelLogos[channelName]
-                    ?: channelLogos.entries.firstOrNull { channelName.replace(" ", "").contains(it.key.replace(" ", ""), ignoreCase = true) }?.value
+                    ?: finalLogoUrl
                     ?: "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random&color=fff&size=512"
 
                 // Encode name and poster in the URL to pass it to the load method
@@ -262,7 +319,7 @@ object MovixLiveTV {
         Log.d(TAG, "Adding stream: $displayName -> $streamUrl")
 
         val extLink = ExtractorLink(
-            source = "MovixLive",
+            source = displayName,
             name = displayName,
             url = streamUrl,
             referer = customHeaders["Referer"] ?: mainUrl,
