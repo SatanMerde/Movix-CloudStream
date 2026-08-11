@@ -28,10 +28,10 @@ object MovixLiveTV {
             parsed?.metas?.mapNotNull { meta ->
                 val channelName = meta.name ?: return@mapNotNull null
                 val channelId = meta.id ?: return@mapNotNull null
-                plugin.newTvSeriesSearchResponse(
+                plugin.newMovieSearchResponse(
                     channelName,
                     "livetv/$channelId",
-                    TvType.TvSeries
+                    TvType.Movie
                 ) {
                     this.posterUrl = meta.poster
                 }
@@ -77,11 +77,11 @@ object MovixLiveTV {
                 "\uD83D\uDCE1 Chaîne en direct"
             }
 
-            plugin.newTvSeriesLoadResponse(
+            plugin.newMovieLoadResponse(
                 channelName,
                 "livetv/$channelId",
-                TvType.TvSeries,
-                emptyList() // episodes list is empty for live TV
+                TvType.Movie,
+                "livetv/$channelId" // url is required for dataUrl argument
             ) {
                 this.plot = description
                 this.posterUrl = "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random"
