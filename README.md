@@ -23,6 +23,13 @@ You can install the repository by clicking the logo down below on the device whe
   <a href="https://linktr.ee/kraptorcs">All Of My Links</a>
 </h2>
 
+# `Nouveautés` | `Changelog`
+
+### 📺 Movix Addon (v29)
+- **Support Live TV ajouté** : Intégration complète de la section TV en Direct (Wiflix, Linkzy, Sosplay, Daddylive).
+- Ajout de 12 nouvelles catégories Live TV (Généraliste, Sport, Cinéma, Documentaires, Enfants, Musique, Info) directement sur la page d'accueil de CloudStream.
+- Extraction des flux HLS/m3u8 en direct via les serveurs de streaming.
+
 # `Geliştiriciler` | `Developers`
 
 <table>
