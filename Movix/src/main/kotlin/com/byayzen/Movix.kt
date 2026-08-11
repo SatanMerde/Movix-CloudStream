@@ -19,9 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class Movix : MainAPI() {
-    override var mainUrl: String
-        get() = runBlocking { MovixHelper.updatemainurl() }
-        set(value) {}
+    override var mainUrl: String = "https://movix.fun"
     override var name = "Movix"
     override val hasMainPage = true
     override var lang = "fr"
@@ -101,8 +99,8 @@ class Movix : MainAPI() {
         // Handle Live TV categories
         if (d.startsWith("livetv:")) {
             val catalogId = d.removePrefix("livetv:")
-            MovixHelper.updatemainurl()
-            val currentUrl = mainUrl
+            val currentUrl = MovixHelper.updatemainurl()
+            mainUrl = currentUrl
             val domainsilici = currentUrl
                 .removePrefix("https://").removePrefix("http://").removePrefix("www.")
                 .removeSuffix("/")
@@ -128,7 +126,7 @@ class Movix : MainAPI() {
             else -> "$tmdbbase/$d?api_key=$tmdbkey&language=$tmdblang&page=$page"
         }
 
-        val res = app.get(url).parsed<TmdbMainResponse>()
+        val res = app.get(url).parsedSafe<TmdbMainResponse>() ?: return newHomePageResponse(request.name, emptyList())
         val home = res.results.mapNotNull { it.toMainPageResult(t) }
         return newHomePageResponse(request.name, home)
     }
@@ -136,7 +134,7 @@ class Movix : MainAPI() {
     override suspend fun search(query: String, page: Int): SearchResponseList {
         val url =
             "$tmdbbase/search/multi?api_key=$tmdbkey&query=$query&language=$tmdblang&page=$page"
-        val res = app.get(url).parsed<TmdbMainResponse>()
+        val res = app.get(url).parsedSafe<TmdbMainResponse>() ?: return newSearchResponseList(emptyList(), false)
         val results = res.results.mapNotNull {
             val type = it.media_type ?: return@mapNotNull null
             if (type == "person") return@mapNotNull null
@@ -151,8 +149,8 @@ class Movix : MainAPI() {
         // Handle Live TV channels
         if (url.startsWith("livetv/") || url.contains("livetv/")) {
             val channelId = url.substringAfterLast("livetv/")
-            MovixHelper.updatemainurl()
-            val currentUrl = mainUrl
+            val currentUrl = MovixHelper.updatemainurl()
+            mainUrl = currentUrl
             val domainsilici = currentUrl
                 .removePrefix("https://").removePrefix("http://").removePrefix("www.")
                 .removeSuffix("/")
@@ -171,7 +169,7 @@ class Movix : MainAPI() {
 
         val tmdburl =
             "$tmdbbase/$type/$id?api_key=$tmdbkey&language=$tmdblang&append_to_response=credits,recommendations,videos,images&include_image_language=$currentlang,en,null"
-        val res = app.get(tmdburl).parsed<TmdbDetailResponse>()
+        val res = app.get(tmdburl).parsedSafe<TmdbDetailResponse>() ?: return null
 
         val titleText =
             res.title ?: res.name ?: res.original_title ?: res.original_name ?: return null
@@ -261,8 +259,8 @@ class Movix : MainAPI() {
                 subtitleCallback(newSubtitleFile(langName, sub.url))
             }
         }
-        MovixHelper.updatemainurl()
-        val currentUrl = mainUrl
+        val currentUrl = MovixHelper.updatemainurl()
+        mainUrl = currentUrl
         Log.d("movix", "Loadlinks domaini: $currentUrl")
 
         val domainsilici = currentUrl
