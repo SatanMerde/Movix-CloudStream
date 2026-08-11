@@ -23,6 +23,16 @@ Ce dépôt héberge l'extension exclusive **Movix** destinée à l'application *
    ```
 4. Cliquez sur l'icône de téléchargement à côté de l'extension **Movix** pour l'installer.
 
+## 🤖 Note sur le Développement
+
+**Transparence :** Toutes les modifications apportées au projet Movix original (ajout du support Live TV, refonte du code) ont été réalisées **exclusivement par une Intelligence Artificielle**. 
+Bien que le code ait été testé, il est possible qu'il contienne des erreurs inattendues, des bugs ou des comportements non prévus.
+
+## 🐛 Bugs et Suggestions
+
+Vous avez rencontré un problème ou vous souhaitez qu'une nouvelle fonctionnalité soit ajoutée (comme une nouvelle source de chaînes) ?
+- **Signaler un Bug / Demander un Ajout :** Utilisez l'onglet [**Issues**](https://github.com/SatanMerde/Cs-Karma/issues) (Problèmes) de ce dépôt GitHub. Décrivez votre problème de manière détaillée pour qu'il puisse être examiné.
+
 ---
 
 ## ⚖️ Avis Légal (Disclaimer)
