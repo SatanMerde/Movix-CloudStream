@@ -33,7 +33,8 @@ object MovixLiveTV {
                     "livetv/$channelId",
                     TvType.Movie
                 ) {
-                    this.posterUrl = meta.poster
+                    this.posterUrl = meta.poster?.takeIf { it.isNotBlank() }
+                        ?: "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random&color=fff&size=512"
                 }
             } ?: emptyList()
         } catch (e: Exception) {
