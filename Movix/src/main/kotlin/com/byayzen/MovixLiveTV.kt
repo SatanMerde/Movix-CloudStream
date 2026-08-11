@@ -181,7 +181,12 @@ object MovixLiveTV {
         val displayName = "LIVE | $streamName"
 
         // Determine stream type
-        val isM3u8Stream = streamUrl.contains(".m3u8") || !streamUrl.contains(".mpd")
+        val linkType = when {
+            streamUrl.contains(".m3u8") -> ExtractorLinkType.M3U8
+            streamUrl.contains(".mpd") -> ExtractorLinkType.DASH
+            streamUrl.contains(".ts") -> ExtractorLinkType.VIDEO
+            else -> ExtractorLinkType.M3U8 // Default to M3U8 for live streams
+        }
 
         // Extract custom headers if provided
         val customHeaders = stream.behaviorHints?.proxyHeaders?.request ?: emptyMap()
@@ -202,7 +207,7 @@ object MovixLiveTV {
                 url = streamUrl,
                 referer = customHeaders["Referer"] ?: mainUrl,
                 quality = Qualities.Unknown.value,
-                isM3u8 = isM3u8Stream,
+                type = linkType,
                 headers = finalHeaders
             )
         )
