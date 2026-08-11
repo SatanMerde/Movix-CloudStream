@@ -26,7 +26,7 @@ class Movix : MainAPI() {
     override val hasMainPage = true
     override var lang = "fr"
     override val hasQuickSearch = true
-    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries, TvType.Anime, TvType.Live)
+    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries, TvType.Anime)
 
     override val mainPage = mainPageOf(
         "movie/now_playing" to "Nouveaux Films",
@@ -112,7 +112,7 @@ class Movix : MainAPI() {
                 "Origin" to "https://$domainsilici",
                 "Referer" to "https://$domainsilici/"
             )
-            val home = MovixLiveTV.fetchCatalog(apibase, catalogId, apiheaders)
+            val home = MovixLiveTV.fetchCatalog(this@Movix, apibase, catalogId, apiheaders)
             return newHomePageResponse(request.name, home)
         }
 
@@ -162,7 +162,7 @@ class Movix : MainAPI() {
                 "Origin" to "https://$domainsilici",
                 "Referer" to "https://$domainsilici/"
             )
-            return MovixLiveTV.loadChannel(apibase, channelId, apiheaders, currentUrl)
+            return MovixLiveTV.loadChannel(this@Movix, apibase, channelId, apiheaders, currentUrl)
         }
 
         val id = url.split("/").last()
@@ -279,7 +279,7 @@ class Movix : MainAPI() {
                 "Referer" to "https://$domainsilici/"
             )
             return@coroutineScope MovixLiveTV.loadStreamLinks(
-                apibase, channelId, apiheaders, currentUrl, subtitleCallback, callback
+                this@Movix, apibase, channelId, apiheaders, currentUrl, subtitleCallback, callback
             )
         }
 

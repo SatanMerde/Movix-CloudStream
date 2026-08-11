@@ -14,6 +14,7 @@ object MovixLiveTV {
      * Returns a list of LiveSearchResponse for the CloudStream home page.
      */
     suspend fun fetchCatalog(
+        plugin: MainAPI,
         apibase: String,
         catalogId: String,
         headers: Map<String, String>
@@ -27,10 +28,10 @@ object MovixLiveTV {
             parsed?.metas?.mapNotNull { meta ->
                 val channelName = meta.name ?: return@mapNotNull null
                 val channelId = meta.id ?: return@mapNotNull null
-                newMovieSearchResponse(
+                plugin.newTvSeriesSearchResponse(
                     channelName,
                     "livetv/$channelId",
-                    TvType.Live
+                    TvType.TvSeries
                 ) {
                     this.posterUrl = meta.poster
                 }
@@ -45,26 +46,23 @@ object MovixLiveTV {
      * Loads channel detail for the detail page in CloudStream.
      */
     suspend fun loadChannel(
+        plugin: MainAPI,
         apibase: String,
         channelId: String,
         headers: Map<String, String>,
         mainUrl: String
     ): LoadResponse? {
-        // Try to get the channel info from the stream endpoint with mode=sources
         val url = "$apibase/livetv/stream/tv/$channelId?mode=sources"
         Log.d(TAG, "Loading channel: $url")
 
         return try {
             val response = app.get(url, headers = headers, timeout = 15).text
-
-            // Try to extract channel name from multiple possible response formats
             val sourcesResponse = tryParseJson<LiveTvSourcesResponse>(response)
             val streamResponse = tryParseJson<LiveTvStreamResponse>(response)
 
             val serverCount = sourcesResponse?.sources?.size
                 ?: streamResponse?.streams?.size ?: 0
 
-            // Use channel ID as fallback name, clean it up
             val channelName = channelId
                 .replace("_", " ")
                 .replace("-", " ")
@@ -79,13 +77,14 @@ object MovixLiveTV {
                 "\uD83D\uDCE1 Chaîne en direct"
             }
 
-            newMovieLoadResponse(
+            plugin.newTvSeriesLoadResponse(
                 channelName,
                 "livetv/$channelId",
-                TvType.Live,
-                "livetv/$channelId"
+                TvType.TvSeries,
+                emptyList() // episodes list is empty for live TV
             ) {
                 this.plot = description
+                this.posterUrl = "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random"
             }
         } catch (e: Exception) {
             Log.d(TAG, "Error loading channel $channelId: ${e.message}")
@@ -95,10 +94,9 @@ object MovixLiveTV {
 
     /**
      * Extracts stream links for a live TV channel.
-     * First tries mode=sources to get the list of sources,
-     * then fetches each source by index.
      */
     suspend fun loadStreamLinks(
+        plugin: MainAPI,
         apibase: String,
         channelId: String,
         headers: Map<String, String>,
@@ -109,18 +107,12 @@ object MovixLiveTV {
         Log.d(TAG, "Loading stream links for: $channelId")
 
         try {
-            // Step 1: Get available sources
             val sourcesUrl = "$apibase/livetv/stream/tv/$channelId?mode=sources"
             val sourcesResponse = app.get(sourcesUrl, headers = headers, timeout = 15).text
-            Log.d(TAG, "Sources response length: ${sourcesResponse.length}")
 
-            // Try parsing as sources list first
             val sourcesData = tryParseJson<LiveTvSourcesResponse>(sourcesResponse)
 
             if (sourcesData?.sources != null && sourcesData.sources.isNotEmpty()) {
-                // We have a list of sources, fetch each one by index
-                Log.d(TAG, "Found ${sourcesData.sources.size} sources")
-
                 for ((index, source) in sourcesData.sources.withIndex()) {
                     try {
                         val streamUrl = "$apibase/livetv/stream/tv/$channelId?sourceIndex=$index"
@@ -128,7 +120,7 @@ object MovixLiveTV {
                         val streamData = tryParseJson<LiveTvStreamResponse>(streamResponse)
 
                         streamData?.streams?.forEach { stream ->
-                            processStream(stream, source.name ?: "Source ${index + 1}", mainUrl, callback)
+                            processStream(plugin, stream, source.name ?: "Source ${index + 1}", mainUrl, callback)
                         }
                     } catch (e: Exception) {
                         Log.d(TAG, "Error fetching source $index: ${e.message}")
@@ -136,22 +128,19 @@ object MovixLiveTV {
                 }
             }
 
-            // Also try parsing as direct streams response
             val directStreams = tryParseJson<LiveTvStreamResponse>(sourcesResponse)
             if (directStreams?.streams != null && directStreams.streams.isNotEmpty()) {
-                Log.d(TAG, "Found ${directStreams.streams.size} direct streams")
                 directStreams.streams.forEach { stream ->
-                    processStream(stream, "Direct", mainUrl, callback)
+                    processStream(plugin, stream, "Direct", mainUrl, callback)
                 }
             }
 
-            // Step 2: Also try without mode parameter as fallback
             try {
                 val fallbackUrl = "$apibase/livetv/stream/tv/$channelId"
                 val fallbackResponse = app.get(fallbackUrl, headers = headers, timeout = 15).text
                 val fallbackData = tryParseJson<LiveTvStreamResponse>(fallbackResponse)
                 fallbackData?.streams?.forEach { stream ->
-                    processStream(stream, "Live", mainUrl, callback)
+                    processStream(plugin, stream, "Live", mainUrl, callback)
                 }
             } catch (e: Exception) {
                 Log.d(TAG, "Fallback stream fetch error: ${e.message}")
@@ -165,10 +154,8 @@ object MovixLiveTV {
         return true
     }
 
-    /**
-     * Processes a single stream entry and passes it to the callback.
-     */
     private fun processStream(
+        plugin: MainAPI,
         stream: LiveTvStream,
         sourceName: String,
         mainUrl: String,
@@ -180,15 +167,13 @@ object MovixLiveTV {
         val streamName = stream.name ?: stream.title ?: sourceName
         val displayName = "LIVE | $streamName"
 
-        // Determine stream type
         val linkType = when {
             streamUrl.contains(".m3u8") -> ExtractorLinkType.M3U8
             streamUrl.contains(".mpd") -> ExtractorLinkType.DASH
             streamUrl.contains(".ts") -> ExtractorLinkType.VIDEO
-            else -> ExtractorLinkType.M3U8 // Default to M3U8 for live streams
+            else -> ExtractorLinkType.M3U8 
         }
 
-        // Extract custom headers if provided
         val customHeaders = stream.behaviorHints?.proxyHeaders?.request ?: emptyMap()
 
         val finalHeaders = buildMap {
@@ -200,16 +185,16 @@ object MovixLiveTV {
 
         Log.d(TAG, "Adding stream: $displayName -> $streamUrl")
 
-        callback(
-            ExtractorLink(
-                source = "MovixLive",
-                name = displayName,
-                url = streamUrl,
-                referer = customHeaders["Referer"] ?: mainUrl,
-                quality = Qualities.Unknown.value,
-                type = linkType,
-                headers = finalHeaders
-            )
+        val extLink = ExtractorLink(
+            source = "MovixLive",
+            name = displayName,
+            url = streamUrl,
+            referer = customHeaders["Referer"] ?: mainUrl,
+            quality = Qualities.Unknown.value,
+            type = linkType,
+            headers = finalHeaders
         )
+        
+        callback(extLink)
     }
 }
