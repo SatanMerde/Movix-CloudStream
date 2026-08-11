@@ -362,3 +362,68 @@ fun Videovarmiyokmu(url: String, client: OkHttpClient): Boolean {
         false
     }
 }
+
+// ===== Live TV API Data Classes =====
+
+data class LiveTvManifestResponse(
+    val catalogs: List<LiveTvCatalogInfo>? = null
+)
+
+data class LiveTvCatalogInfo(
+    val id: String? = null,
+    val name: String? = null,
+    val type: String? = null
+)
+
+data class LiveTvCatalogResponse(
+    val metas: List<LiveTvMeta>? = null
+)
+
+data class LiveTvMeta(
+    val id: String? = null,
+    val name: String? = null,
+    val poster: String? = null,
+    val background: String? = null,
+    val description: String? = null,
+    val _isLive: Boolean? = null,
+    val _serverCount: Int? = null,
+    val _competition: String? = null,
+    val _timestamp: Long? = null,
+    val _servers: List<LiveTvServer>? = null
+)
+
+data class LiveTvServer(
+    val name: String? = null,
+    val url: String? = null
+)
+
+data class LiveTvStreamResponse(
+    val streams: List<LiveTvStream>? = null
+)
+
+data class LiveTvStream(
+    val url: String? = null,
+    val name: String? = null,
+    val title: String? = null,
+    val externalUrl: String? = null,
+    val behaviorHints: LiveTvBehaviorHints? = null
+)
+
+data class LiveTvBehaviorHints(
+    val proxyHeaders: LiveTvProxyHeaders? = null,
+    val notWebReady: Boolean? = null
+)
+
+data class LiveTvProxyHeaders(
+    val request: Map<String, String>? = null
+)
+
+data class LiveTvSourcesResponse(
+    val sources: List<LiveTvSourceInfo>? = null,
+    val streams: List<LiveTvStream>? = null
+)
+
+data class LiveTvSourceInfo(
+    val name: String? = null,
+    val index: Int? = null
+)

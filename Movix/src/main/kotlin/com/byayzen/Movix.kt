@@ -26,7 +26,7 @@ class Movix : MainAPI() {
     override val hasMainPage = true
     override var lang = "fr"
     override val hasQuickSearch = true
-    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries, TvType.Anime)
+    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries, TvType.Anime, TvType.Live)
 
     override val mainPage = mainPageOf(
         "movie/now_playing" to "Nouveaux Films",
@@ -63,6 +63,18 @@ class Movix : MainAPI() {
         "tv/9648" to "Mystère TV",
         "tv/10763" to "Actualités",
         "tv/10764" to "Téléréalité",
+        "livetv:wiflix_generaliste" to "📺 TV Généraliste",
+        "livetv:wiflix_sport" to "⚽ TV Sport",
+        "livetv:wiflix_cinema" to "🎥 TV Cinéma",
+        "livetv:wiflix_documentaire" to "🌍 TV Documentaires",
+        "livetv:wiflix_enfants" to "🎈 TV Enfants",
+        "livetv:wiflix_info" to "📰 TV Info",
+        "livetv:wiflix_musique" to "🎵 TV Musique",
+        "livetv:linkzy_generaliste" to "📺 Free Généraliste",
+        "livetv:linkzy_sport" to "⚽ Free Sport",
+        "livetv:linkzy_cinema" to "🎥 Free Cinéma",
+        "livetv:sosplay_chaines" to "📡 Sosplay Chaînes",
+        "livetv:daddylive_channels" to "📺 Daddylive",
     )
 
     private fun TmdbResult.toMainPageResult(type: String): SearchResponse? {
@@ -85,6 +97,25 @@ class Movix : MainAPI() {
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val d = request.data
+
+        // Handle Live TV categories
+        if (d.startsWith("livetv:")) {
+            val catalogId = d.removePrefix("livetv:")
+            MovixHelper.updatemainurl()
+            val currentUrl = mainUrl
+            val domainsilici = currentUrl
+                .removePrefix("https://").removePrefix("http://").removePrefix("www.")
+                .removeSuffix("/")
+            val apibase = "https://api.$domainsilici/api"
+            val apiheaders = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:149.0) Gecko/20100101 Firefox/149.0",
+                "Origin" to "https://$domainsilici",
+                "Referer" to "https://$domainsilici/"
+            )
+            val home = MovixLiveTV.fetchCatalog(apibase, catalogId, apiheaders)
+            return newHomePageResponse(request.name, home)
+        }
+
         val t = if (d.contains("movie")) "movie" else "tv"
 
         val url = when {
@@ -117,6 +148,23 @@ class Movix : MainAPI() {
     override suspend fun quickSearch(query: String): List<SearchResponse>? = search(query)
 
     override suspend fun load(url: String): LoadResponse? {
+        // Handle Live TV channels
+        if (url.startsWith("livetv/") || url.contains("livetv/")) {
+            val channelId = url.substringAfterLast("livetv/")
+            MovixHelper.updatemainurl()
+            val currentUrl = mainUrl
+            val domainsilici = currentUrl
+                .removePrefix("https://").removePrefix("http://").removePrefix("www.")
+                .removeSuffix("/")
+            val apibase = "https://api.$domainsilici/api"
+            val apiheaders = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:149.0) Gecko/20100101 Firefox/149.0",
+                "Origin" to "https://$domainsilici",
+                "Referer" to "https://$domainsilici/"
+            )
+            return MovixLiveTV.loadChannel(apibase, channelId, apiheaders, currentUrl)
+        }
+
         val id = url.split("/").last()
         val type = if (url.contains("movie")) "movie" else "tv"
         val currentlang = tmdblang.split("-").first()
@@ -221,6 +269,19 @@ class Movix : MainAPI() {
             .removePrefix("https://").removePrefix("http://").removePrefix("www.")
             .removeSuffix("/")
         val apibase = "https://api.$domainsilici/api"
+
+        // Handle Live TV streams
+        if (data.startsWith("livetv/") || data.contains("livetv/")) {
+            val channelId = data.substringAfterLast("livetv/")
+            val apiheaders = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:149.0) Gecko/20100101 Firefox/149.0",
+                "Origin" to "https://$domainsilici",
+                "Referer" to "https://$domainsilici/"
+            )
+            return@coroutineScope MovixLiveTV.loadStreamLinks(
+                apibase, channelId, apiheaders, currentUrl, subtitleCallback, callback
+            )
+        }
 
         val parts = data.split("-")
         val rawpath = parts[0]
