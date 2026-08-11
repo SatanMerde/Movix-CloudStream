@@ -19,7 +19,7 @@ Ce dépôt héberge l'extension exclusive **Movix** destinée à l'application *
 2. Allez dans **Paramètres > Extensions > + Ajouter un dépôt**.
 3. Saisissez un nom (ex: "Movix Repo") et collez l'URL suivante :
    ```text
-   https://raw.githubusercontent.com/SatanMerde/Cs-Karma/builds/repo.json
+   https://raw.githubusercontent.com/SatanMerde/Movix-CloudStream/builds/repo.json
    ```
 4. Cliquez sur l'icône de téléchargement à côté de l'extension **Movix** pour l'installer.
 
@@ -31,7 +31,7 @@ Bien que le code ait été testé, il est possible qu'il contienne des erreurs i
 ## 🐛 Bugs et Suggestions
 
 Vous avez rencontré un problème ou vous souhaitez qu'une nouvelle fonctionnalité soit ajoutée (comme une nouvelle source de chaînes) ?
-- **Signaler un Bug / Demander un Ajout :** Utilisez l'onglet [**Issues**](https://github.com/SatanMerde/Cs-Karma/issues) (Problèmes) de ce dépôt GitHub. Décrivez votre problème de manière détaillée pour qu'il puisse être examiné.
+- **Signaler un Bug / Demander un Ajout :** Utilisez l'onglet [**Issues**](https://github.com/SatanMerde/Movix-CloudStream/issues) (Problèmes) de ce dépôt GitHub. Décrivez votre problème de manière détaillée pour qu'il puisse être examiné.
 
 ---
 
