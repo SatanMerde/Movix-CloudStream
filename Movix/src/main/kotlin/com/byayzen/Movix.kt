@@ -20,7 +20,7 @@ import java.util.Locale
 
 class Movix : MainAPI() {
     override var mainUrl: String = "https://movix.fun"
-    override var name = "Movix"
+    override var name = "Movix+"
     override val hasMainPage = true
     override var lang = "fr"
     override val hasQuickSearch = true
