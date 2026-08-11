@@ -1,57 +1,37 @@
 <div align="center">
 
-# `Cs-Karma`
+# 🎬 Movix Addon pour CloudStream
 
-`Kısa Kodlar`: **cskarma** ya da **karmator**
-<br>
-`Short Codes`: **cskarma** or **karmator**
-
-<hr>
-
-Uygulamanın kurulu olduğu cihazda alttaki logoya tıklayıp kurulumu gerçekleştirebilirsiniz. 
-<br>
-<br>
-You can install the repository by clicking the logo down below on the device where the app is installed.
-
-[<img alt="Cs-Karma logo" width="200px" src="https://raw.githubusercontent.com/Kraptor123/Cs-Karma/refs/heads/master/.github/logo/cskarma.png"/>](https://kraptor123.github.io/redirect/?r=cloudstreamrepo://raw.githubusercontent.com/Kraptor123/cs-Karma/refs/heads/master/repo.json)
-
-<h2 align="center">
-<br>
-  <a href="https://linktr.ee/kraptorcs">Tüm Linklerim</a>
-  <br>
-  <br>
-  <a href="https://linktr.ee/kraptorcs">All Of My Links</a>
-</h2>
-
-# `Nouveautés` | `Changelog`
-
-### 📺 Movix Addon (v29)
-- **Support Live TV ajouté** : Intégration complète de la section TV en Direct (Wiflix, Linkzy, Sosplay, Daddylive).
-- Ajout de 12 nouvelles catégories Live TV (Généraliste, Sport, Cinéma, Documentaires, Enfants, Musique, Info) directement sur la page d'accueil de CloudStream.
-- Extraction des flux HLS/m3u8 en direct via les serveurs de streaming.
-
-# `Geliştiriciler` | `Developers`
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/Kraptor123">
-        <img src="https://avatars.githubusercontent.com/u/89366989?v=4" width="80;" alt="Kraptor"/><br />
-        <sub><b>kraptor</b></sub>
-        </a>
-    </td>
-     <td align="center">
-      <a href="https://github.com/ByAyzen">
-        <img src="https://avatars.githubusercontent.com/u/189399597?v=4" width="80;" alt="ByAyzen"/><br />
-        <sub><b>ByAyzen</b></sub>
-        </a>
-    </td>
-     <td align="center">
-      <a href="https://github.com/trup40">
-        <img src="https://avatars.githubusercontent.com/u/34142302?v=4" width="80;" alt="Eagle"/><br />
-        <sub><b>Eagle</b></sub>
-        </a>
-  </tr>
-</table>
+Ce dépôt héberge l'extension exclusive **Movix** destinée à l'application **[CloudStream 3](https://github.com/recloudstream/cloudstream)**.
 
 </div>
+
+## 📖 À propos
+
+**Movix** est un plugin francophone performant pour CloudStream permettant d'explorer et de lire divers contenus multimédias :
+- 🎥 **Films et Séries** : Parcourez les bibliothèques et nouveautés (incluant les plateformes populaires comme Netflix, Prime Video, Disney+, etc.).
+- 📺 **Live TV (Télévision en direct)** : Regardez des chaînes en direct incluant le sport, le cinéma, les documentaires et les chaînes généralistes (via Wiflix, Linkzy, Sosplay...).
+- 🎌 **Anime** : Retrouvez vos animés préférés.
+
+### 📥 Comment l'installer ?
+
+1. Installez l'application CloudStream 3 sur votre appareil Android ou votre TV.
+2. Allez dans **Paramètres > Extensions > + Ajouter un dépôt**.
+3. Saisissez un nom (ex: "Movix Repo") et collez l'URL suivante :
+   ```text
+   https://raw.githubusercontent.com/SatanMerde/Cs-Karma/builds/repo.json
+   ```
+4. Cliquez sur l'icône de téléchargement à côté de l'extension **Movix** pour l'installer.
+
+---
+
+## ⚖️ Avis Légal (Disclaimer)
+
+**Avertissement important :** Ce projet (incluant tout le code source de l'addon) est fourni à des fins strictement **éducatives et de démonstration technique**. 
+
+- **Aucun contenu n'est hébergé ici :** Les créateurs et contributeurs de ce dépôt n'hébergent, ne stockent, ni ne distribuent aucune vidéo, aucun flux de télévision en direct (IPTV) ni aucun contenu protégé par des droits d'auteur sur ces serveurs.
+- **Fonctionnement d'agrégateur :** Cet addon fonctionne uniquement comme un moteur de recherche (web scraper) côté client. Il ne fait que parcourir les liens et répercuter le contenu publiquement accessible sur Internet, de la même manière qu'un navigateur web standard le ferait.
+- **Responsabilité de l'utilisateur final :** L'accès à des contenus sous droits d'auteur sans l'autorisation des ayants droit est interdit par la loi dans de nombreux pays. Les développeurs déclinent formellement toute responsabilité quant à l'utilisation finale qui est faite de ce code. L'utilisateur assume l'entière responsabilité de ses actes et doit s'assurer que l'utilisation de cette application est conforme à la législation locale de son pays.
+
+---
+*Ce dépôt est un fork personnalisé conservant uniquement le projet Movix. Crédits originaux à @Kraptor et @ByAyzen.*
