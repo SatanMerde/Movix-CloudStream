@@ -201,16 +201,15 @@ object MovixLiveTV {
         Log.d(TAG, "Adding stream: $displayName -> $streamUrl")
 
         callback(
-            newExtractorLink(
+            ExtractorLink(
                 source = "MovixLive",
                 name = displayName,
                 url = streamUrl,
-                type = linkType
-            ) {
-                this.headers = finalHeaders
-                this.quality = Qualities.Unknown.value
-                this.referer = customHeaders["Referer"] ?: mainUrl
-            }
+                referer = customHeaders["Referer"] ?: mainUrl,
+                quality = Qualities.Unknown.value,
+                isM3u8 = linkType == ExtractorLinkType.M3U8,
+                headers = finalHeaders
+            )
         )
     }
 }
