@@ -2,7 +2,6 @@
 version = 30
 
 cloudstream {
-    name = "Movix+"
     authors     = listOf("ByAyzen")
     language    = "fr"
     description = "Explorez les films, séries, collections, alertes, recommandations et chaînes en direct Movix."
