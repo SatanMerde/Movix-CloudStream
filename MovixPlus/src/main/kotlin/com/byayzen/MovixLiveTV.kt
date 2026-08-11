@@ -4,6 +4,7 @@ import com.lagradost.api.Log
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
+import android.util.Base64
 
 object MovixLiveTV {
 
@@ -28,13 +29,18 @@ object MovixLiveTV {
             parsed?.metas?.mapNotNull { meta ->
                 val channelName = meta.name ?: return@mapNotNull null
                 val channelId = meta.id ?: return@mapNotNull null
+                val poster = meta.poster?.takeIf { it.isNotBlank() }
+                    ?: "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random&color=fff&size=512"
+
+                // Encode name and poster in the URL to pass it to the load method
+                val encodedData = Base64.encodeToString(channelName.toByteArray(), Base64.NO_WRAP) + "||" + Base64.encodeToString(poster.toByteArray(), Base64.NO_WRAP)
+                
                 plugin.newMovieSearchResponse(
                     channelName,
-                    "livetv/$channelId",
+                    "livetv/$channelId||$encodedData",
                     TvType.Movie
                 ) {
-                    this.posterUrl = meta.poster?.takeIf { it.isNotBlank() }
-                        ?: "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random&color=fff&size=512"
+                    this.posterUrl = poster
                 }
             } ?: emptyList()
         } catch (e: Exception) {
@@ -49,28 +55,39 @@ object MovixLiveTV {
     suspend fun loadChannel(
         plugin: MainAPI,
         apibase: String,
-        channelId: String,
+        channelIdWithData: String,
         headers: Map<String, String>,
         mainUrl: String
     ): LoadResponse? {
+        val parts = channelIdWithData.split("||")
+        val channelId = parts[0]
+        
+        val passedName = parts.getOrNull(1)?.let { String(Base64.decode(it, Base64.NO_WRAP)) }
+        val passedPoster = parts.getOrNull(2)?.let { String(Base64.decode(it, Base64.NO_WRAP)) }
+
+        // Try to get the channel info from the stream endpoint with mode=sources
         val url = "$apibase/livetv/stream/tv/$channelId?mode=sources"
         Log.d(TAG, "Loading channel: $url")
 
         return try {
             val response = app.get(url, headers = headers, timeout = 15).text
+
+            // Try to extract channel name from multiple possible response formats
             val sourcesResponse = tryParseJson<LiveTvSourcesResponse>(response)
             val streamResponse = tryParseJson<LiveTvStreamResponse>(response)
 
             val serverCount = sourcesResponse?.sources?.size
                 ?: streamResponse?.streams?.size ?: 0
 
-            val channelName = channelId
+            val fallbackName = channelId
                 .replace("_", " ")
                 .replace("-", " ")
                 .split(" ")
                 .joinToString(" ") { word ->
                     word.replaceFirstChar { it.uppercase() }
                 }
+
+            val channelName = passedName ?: fallbackName
 
             val description = if (serverCount > 0) {
                 "\uD83D\uDCE1 $serverCount source(s) disponible(s) — Chaîne en direct"
@@ -80,12 +97,12 @@ object MovixLiveTV {
 
             plugin.newMovieLoadResponse(
                 channelName,
-                "livetv/$channelId",
+                "livetv/$channelIdWithData",
                 TvType.Movie,
-                "livetv/$channelId" // url is required for dataUrl argument
+                "livetv/$channelIdWithData" // url is required for dataUrl argument
             ) {
                 this.plot = description
-                this.posterUrl = "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random"
+                this.posterUrl = passedPoster ?: "https://ui-avatars.com/api/?name=${channelName.replace(" ", "+")}&background=random"
             }
         } catch (e: Exception) {
             Log.d(TAG, "Error loading channel $channelId: ${e.message}")
@@ -99,12 +116,13 @@ object MovixLiveTV {
     suspend fun loadStreamLinks(
         plugin: MainAPI,
         apibase: String,
-        channelId: String,
+        channelIdWithData: String,
         headers: Map<String, String>,
         mainUrl: String,
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
+        val channelId = channelIdWithData.split("||")[0]
         Log.d(TAG, "Loading stream links for: $channelId")
 
         try {
