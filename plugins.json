@@ -1,0 +1,24 @@
+[
+    {
+        "url": "https://raw.githubusercontent.com/SatanMerde/Movix-CloudStream/builds/MovixPlus.cs3",
+        "status": 1,
+        "version": 34,
+        "name": "MovixPlus",
+        "internalName": "MovixPlus",
+        "authors": [
+            "ByAyzen"
+        ],
+        "description": "Explorez les films, s\u00e9ries, collections, alertes, recommandations et cha\u00eenes en direct Movix.",
+        "fileSize": 147730,
+        "repositoryUrl": "https://github.com/SatanMerde/Movix-CloudStream",
+        "language": "fr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Anime"
+        ],
+        "iconUrl": "https://raw.githubusercontent.com/SatanMerde/Movix-CloudStream/master/movix_plus.jpg",
+        "apiVersion": 1,
+        "fileHash": "sha256-04a679bf90be6fb5be84acfaed3196aa8929432819db988431974791c5c54800"
+    }
+]

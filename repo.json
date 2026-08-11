@@ -1,0 +1,9 @@
+{
+  "iconUrl": "https://raw.githubusercontent.com/SatanMerde/Movix-CloudStream/master/movix_plus.jpg",
+  "name": "Movix-CloudStream",
+  "description": "Dépôt exclusif pour l'addon Movix.",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/SatanMerde/Movix-CloudStream/refs/heads/builds/plugins.json"
+  ]
+}
