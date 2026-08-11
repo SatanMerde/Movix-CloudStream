@@ -1,9 +1,9 @@
 {
   "iconUrl": "https://raw.githubusercontent.com/Kraptor123/Cs-Karma/refs/heads/master/.github/logo/cskarma.png",
-  "name": "cs-karma",
-  "description": "Plugins Across All Categories and Languages.",
+  "name": "Movix-CloudStream",
+  "description": "Dépôt exclusif pour l'addon Movix.",
   "manifestVersion": 1,
   "pluginLists": [
-    "https://raw.githubusercontent.com/Kraptor123/Cs-Karma/refs/heads/builds/plugins.json"
+    "https://raw.githubusercontent.com/SatanMerde/Movix-CloudStream/refs/heads/builds/plugins.json"
   ]
 }
